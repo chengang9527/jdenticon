@@ -562,11 +562,13 @@ function observer(updateCallback) {
                     // the querySelectorAll method => runtime error.
                     if (addedNode.nodeType == Node.ELEMENT_NODE) {
                         if (dom.getIdenticonType(addedNode)) {
+                            console.log("jdenticon: new icon candidate detected " + addedNode.tagName);
                             updateCallback(addedNode);
                         }
                         else {
                             var icons = addedNode.querySelectorAll(dom.ICON_SELECTOR);
                             for (var iconIndex = 0; iconIndex < icons.length; iconIndex++) {
+                                console.log("jdenticon: new icon candidate detected " + icons[iconIndex].tagName);
                                 updateCallback(icons[iconIndex]);
                             }
                         }
@@ -574,6 +576,7 @@ function observer(updateCallback) {
                 }
                 
                 if (mutation.type == "attributes" && dom.getIdenticonType(mutation.target)) {
+                    console.log("jdenticon: attribution changes detected " + addedNode.tagName);
                     updateCallback(mutation.target);
                 }
             }
@@ -585,6 +588,11 @@ function observer(updateCallback) {
             "attributeFilter": [dom.VALUE_ATTRIBUTE, dom.HASH_ATTRIBUTE, "width", "height"], 
             "subtree": true 
         });
+        
+        console.log("jdenticon: MutationObserver was configured");
+    }
+    else {
+        console.log("jdenticon: MutationObserver not supported");
     }
 }
 
@@ -1254,6 +1262,8 @@ function update(el, hash, padding) {
         // No hash specified. Don't render an icon.
         return;
     }
+
+    console.log("jdenticon: render " + el.tagName);
     
     var renderer = iconType == dom.ICON_TYPE_SVG ? 
         new SvgRenderer(new SvgElement(el)) : 
@@ -1309,14 +1319,13 @@ function jdenticon() {
  * This function is called once upon page load.
  */
 function jdenticonStartup() {
-    var replaceMode = (jdenticon["config"] || global["jdenticon_config"] || { })["replaceMode"];
-    if (replaceMode != "never") {
-        jdenticon();
-        
-        if (replaceMode == "observe") {
-            observer(update);
-        }
-    }
+    console.log("jdenticon: jdenticonStartup called");
+    console.log("jdenticon: browser: " + navigator.userAgent);
+    
+    jdenticon();
+    observer(update);
+    
+    console.log("jdenticon: jdenticonStartup finished");
 }
 
 // Public API
